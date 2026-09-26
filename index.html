@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Spelling Game</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #dff4ff, #fff8d6);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.game {
+    width: 100%;
+    max-width: 720px;
+    background: white;
+    border-radius: 25px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    text-align: center;
+    position: relative;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+    color: #333;
+}
+
+.score-box {
+    background: #fff3cd;
+    padding: 8px 14px;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.timer-box {
+    background: #e8f5e9;
+    padding: 8px 14px;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.timer {
+    color: #2e7d32;
+}
+
+.timer.warning {
+    color: #ef6c00;
+}
+
+.timer.danger {
+    color: #d32f2f;
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-container {
+    width: 100%;
+    height: 10px;
+    background: #eeeeee;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #66bb6a;
+    transition: width 0.4s ease;
+}
+
+/* =========================
+   GROWING PLANT
+========================= */
+
+.plant-area {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(
+        #dff5ff 0%,
+        #efffe8 70%,
+        #aad58e 70%,
+        #91c778 100%
+    );
+    margin-bottom: 10px;
+}
+
+.plant {
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    width: 200px;
+    height: 170px;
+    transform: translateX(-50%);
+    transition: transform 0.4s ease;
+}
+
+/* POT */
+
+.pot {
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 42px;
+    background: #d9865b;
+    border-radius: 5px 5px 20px 20px;
+    z-index: 5;
+}
+
+.pot-top {
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 14px;
+    border-radius: 50%;
+    background: #bd6945;
+}
+
+/* TRUNK */
+
+.trunk {
+    position: absolute;
+    left: 50%;
+    bottom: 43px;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: #8d623e;
+    border-radius: 8px;
+    transition: all 0.4s ease;
+}
+
+/* PLANT HEAD */
+
+.plant-head {
+    position: absolute;
+    left: 50%;
+    bottom: 48px;
+    transform: translateX(-50%);
+    width: 45px;
+    height: 42px;
+    background: #81c784;
+    border: 3px solid #4caf50;
+    border-radius: 50%;
+    z-index: 4;
+    transition: all 0.4s ease;
+}
+
+/* EYES */
+
+.eye {
+    position: absolute;
+    top: 13px;
+    width: 6px;
+    height: 9px;
+    background: #333;
+    border-radius: 50%;
+    transition: height 0.1s;
+}
+
+.eye-left {
+    left: 10px;
+}
+
+.eye-right {
+    right: 10px;
+}
+
+/* MOUTH */
+
+.mouth {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 9px;
+    border-bottom: 3px solid #333;
+    border-radius: 0 0 20px 20px;
+}
+
+/* BLINK */
+
+.plant-head.blink .eye {
+    height: 2px;
+}
+
+/* HAPPY */
+
+.plant-head.happy {
+    transform: translateX(-50%) scale(1.08);
+}
+
+/* LEAVES */
+
+.leaf {
+    position: absolute;
+    width: 32px;
+    height: 23px;
+    background: #66bb6a;
+    border-radius: 100% 0 100% 0;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.4s ease;
+}
+
+.leaf-left-1 {
+    left: 55px;
+    bottom: 70px;
+}
+
+.leaf-right-1 {
+    right: 55px;
+    bottom: 75px;
+    transform: rotate(90deg) scale(0);
+}
+
+.leaf-left-2 {
+    left: 48px;
+    bottom: 100px;
+}
+
+.leaf-right-2 {
+    right: 48px;
+    bottom: 108px;
+    transform: rotate(90deg) scale(0);
+}
+
+.leaf-left-3 {
+    left: 65px;
+    bottom: 125px;
+}
+
+.leaf-right-3 {
+    right: 65px;
+    bottom: 130px;
+    transform: rotate(90deg) scale(0);
+}
+
+/* BRANCHES */
+
+.branch {
+    position: absolute;
+    width: 45px;
+    height: 8px;
+    background: #8d623e;
+    border-radius: 10px;
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.branch-left {
+    left: 60px;
+    bottom: 88px;
+    transform: rotate(-35deg);
+}
+
+.branch-right {
+    right: 60px;
+    bottom: 95px;
+    transform: rotate(35deg);
+}
+
+/* =========================
+   GROWTH STAGES
+========================= */
+
+/* 0 */
+
+.growth-0 .plant-head {
+    width: 38px;
+    height: 35px;
+    bottom: 48px;
+}
+
+.growth-0 .trunk {
+    height: 10px;
+}
+
+/* 1 */
+
+.growth-1 .plant-head {
+    width: 45px;
+    height: 42px;
+    bottom: 52px;
+}
+
+.growth-1 .trunk {
+    height: 16px;
+}
+
+/* 2 */
+
+.growth-2 .plant-head {
+    width: 53px;
+    height: 48px;
+    bottom: 62px;
+}
+
+.growth-2 .trunk {
+    height: 27px;
+}
+
+.growth-2 .leaf-left-1,
+.growth-2 .leaf-right-1 {
+    opacity: 1;
+    transform: scale(0.8);
+}
+
+.growth-2 .leaf-right-1 {
+    transform: rotate(90deg) scale(0.8);
+}
+
+/* 3 */
+
+.growth-3 .plant-head {
+    width: 63px;
+    height: 57px;
+    bottom: 75px;
+}
+
+.growth-3 .trunk {
+    height: 40px;
+}
+
+.growth-3 .leaf-left-1,
+.growth-3 .leaf-right-1,
+.growth-3 .leaf-left-2,
+.growth-3 .leaf-right-2 {
+    opacity: 1;
+    transform: scale(0.9);
+}
+
+.growth-3 .leaf-right-1,
+.growth-3 .leaf-right-2 {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* 4 */
+
+.growth-4 .plant-head {
+    width: 75px;
+    height: 68px;
+    bottom: 88px;
+}
+
+.growth-4 .trunk {
+    width: 19px;
+    height: 55px;
+}
+
+.growth-4 .leaf,
+.growth-4 .branch {
+    opacity: 1;
+}
+
+.growth-4 .leaf-left-1,
+.growth-4 .leaf-right-1,
+.growth-4 .leaf-left-2,
+.growth-4 .leaf-right-2,
+.growth-4 .leaf-left-3,
+.growth-4 .leaf-right-3 {
+    transform: scale(1);
+}
+
+.growth-4 .leaf-right-1,
+.growth-4 .leaf-right-2,
+.growth-4 .leaf-right-3 {
+    transform: rotate(90deg) scale(1);
+}
+
+/* 5 */
+
+.growth-5 .plant-head {
+    width: 88px;
+    height: 80px;
+    bottom: 103px;
+}
+
+.growth-5 .trunk {
+    width: 23px;
+    height: 70px;
+}
+
+.growth-5 .leaf,
+.growth-5 .branch {
+    opacity: 1;
+}
+
+.growth-5 .leaf-left-1,
+.growth-5 .leaf-right-1,
+.growth-5 .leaf-left-2,
+.growth-5 .leaf-right-2,
+.growth-5 .leaf-left-3,
+.growth-5 .leaf-right-3 {
+    transform: scale(1.1);
+}
+
+.growth-5 .leaf-right-1,
+.growth-5 .leaf-right-2,
+.growth-5 .leaf-right-3 {
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* 6 = FULL TREE */
+
+.growth-6 .plant-head {
+    width: 105px;
+    height: 92px;
+    bottom: 110px;
+}
+
+.growth-6 .trunk {
+    width: 27px;
+    height: 78px;
+}
+
+.growth-6 .leaf,
+.growth-6 .branch {
+    opacity: 1;
+}
+
+.growth-6 .leaf-left-1,
+.growth-6 .leaf-right-1,
+.growth-6 .leaf-left-2,
+.growth-6 .leaf-right-2,
+.growth-6 .leaf-left-3,
+.growth-6 .leaf-right-3 {
+    transform: scale(1.2);
+}
+
+.growth-6 .leaf-right-1,
+.growth-6 .leaf-right-2,
+.growth-6 .leaf-right-3 {
+    transform: rotate(90deg) scale(1.2);
+}
+
+/* GROW ANIMATION */
+
+.plant.grow-animation {
+    animation: growBounce 0.7s ease;
+}
+
+@keyframes growBounce {
+    0% {
+        transform: translateX(-50%) scale(1);
+    }
+
+    40% {
+        transform: translateX(-50%) scale(1.12);
+    }
+
+    70% {
+        transform: translateX(-50%) scale(0.96);
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.growth-text {
+    position: absolute;
+    bottom: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.9);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #456b45;
+    z-index: 10;
+}
+
+/* =========================
+   QUESTION
+========================= */
+
+.step-title {
+    font-size: 18px;
+    color: #555;
+    margin: 5px 0 10px;
+}
+
+/* =========================
+   LISTEN
+========================= */
+
+.listen-button {
+    border: none;
+    background: #42a5f5;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 17px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+/* =========================
+   ANSWER
+========================= */
+
+.slots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    min-height: 50px;
+    margin-bottom: 10px;
+}
+
+.letter-slot {
+    width: 45px;
+    height: 48px;
+    border-bottom: 4px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 27px;
+    font-weight: bold;
+}
+
+/* =========================
+   DEFINITION
+========================= */
+
+.definition-box {
+    background: #f3f8ff;
+    border-radius: 15px;
+    padding: 10px;
+    margin: 10px auto;
+}
+
+.definition-label {
+    font-size: 13px;
+    color: #777;
+    font-weight: bold;
+}
+
+.definition {
+    font-size: 17px;
+    margin-top: 3px;
+}
+
+.correct-word {
+    font-size: 18px;
+    font-weight: bold;
+    color: #43a047;
+    margin-top: 5px;
+}
+
+/* =========================
+   LETTER BUTTONS
+========================= */
+
+.letter-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.letter-button {
+    width: 58px;
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    background: #ffe082;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+}
+
+.letter-button:active {
+    transform: scale(0.94);
+}
+
+.letter-button:disabled {
+    opacity: 0.5;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.control-button {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.delete-button {
+    background: #ffab91;
+}
+
+.clear-button {
+    background: #ef9a9a;
+}
+
+/* =========================
+   BACK / NEXT
+========================= */
+
+.navigation {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 13px;
+}
+
+.nav-button {
+    border: none;
+    padding: 11px 22px;
+    border-radius: 15px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.back-button {
+    background: #b0bec5;
+}
+
+.back-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.next-button {
+    background: #66bb6a;
+    color: white;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+.message {
+    min-height: 28px;
+    margin-top: 7px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.correct-message {
+    color: #43a047;
+}
+
+.incorrect-message {
+    color: #e53935;
+}
+
+/* =========================
+   STARS
+========================= */
+
+.star {
+    position: fixed;
+    font-size: 30px;
+    pointer-events: none;
+    animation: starAnimation 1s ease-out forwards;
+    z-index: 50;
+}
+
+@keyframes starAnimation {
+    0% {
+        opacity: 1;
+        transform: scale(0.5);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-120px) scale(1.4) rotate(180deg);
+    }
+}
+
+/* =========================
+   TIME UP
+========================= */
+
+.session-over {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.session-card {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.session-card h2 {
+    font-size: 30px;
+}
+
+.restart-button {
+    border: none;
+    background: #42a5f5;
+    color: white;
+    padding: 13px 25px;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 7px;
+    }
+
+    .game {
+        padding: 13px 8px;
+    }
+
+    .header {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .title {
+        width: 100%;
+        font-size: 22px;
+    }
+
+    .letter-button {
+        width: 52px;
+        height: 49px;
+    }
+
+    .letter-slot {
+        width: 42px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="title">
+            🌱 English Spelling
+        </div>
+
+        <div class="score-box">
+            ⭐ <span id="score">0</span>
+        </div>
+
+        <div class="timer-box">
+            ⏱️ <span id="timer">5:00</span>
+        </div>
+
+    </div>
+
+
+    <!-- PROGRESS -->
+
+    <div class="progress-container">
+        <div
+            class="progress-bar"
+            id="progressBar"
+        ></div>
+    </div>
+
+
+    <!-- =========================
+         GROWING PLANT
+    ========================== -->
+
+    <div class="plant-area">
+
+        <div class="plant growth-0" id="plant">
+
+            <div class="leaf leaf-left-1"></div>
+            <div class="leaf leaf-right-1"></div>
+
+            <div class="leaf leaf-left-2"></div>
+            <div class="leaf leaf-right-2"></div>
+
+            <div class="leaf leaf-left-3"></div>
+            <div class="leaf leaf-right-3"></div>
+
+            <div class="branch branch-left"></div>
+            <div class="branch branch-right"></div>
+
+            <div class="trunk"></div>
+
+            <div
+                class="plant-head"
+                id="plantHead"
+            >
+
+                <div class="eye eye-left"></div>
+                <div class="eye eye-right"></div>
+
+                <div class="mouth"></div>
+
+            </div>
+
+            <div class="pot">
+                <div class="pot-top"></div>
+            </div>
+
+        </div>
+
+        <div
+            class="growth-text"
+            id="growthText"
+        >
+            🌱 0 / 20 correct
+        </div>
+
+    </div>
+
+
+    <!-- QUESTION -->
+
+    <div class="step-title">
+        Question <span id="questionNumber">1</span>
+    </div>
+
+
+    <!-- LISTEN -->
+
+    <button
+        class="listen-button"
+        onclick="speakWord()"
+    >
+        🔊 Hear the Word
+    </button>
+
+
+    <!-- ANSWER -->
+
+    <div
+        class="slots"
+        id="slots"
+    ></div>
+
+
+    <!-- DEFINITION -->
+
+    <div class="definition-box">
+
+        <div class="definition-label">
+            💡 What does it mean?
+        </div>
+
+        <div
+            class="definition"
+            id="definition"
+        ></div>
+
+        <div
+            class="correct-word"
+            id="correctWord"
+        ></div>
+
+    </div>
+
+
+    <!-- LETTERS -->
+
+    <div id="letterRow1" class="letter-row"></div>
+
+    <div id="letterRow2" class="letter-row"></div>
+
+
+    <!-- DELETE / CLEAR -->
+
+    <div class="controls">
+
+        <button
+            class="control-button delete-button"
+            onclick="deleteLetter()"
+        >
+            ⌫ Delete
+        </button>
+
+        <button
+            class="control-button clear-button"
+            onclick="clearWord()"
+        >
+            ✕ Clear
+        </button>
+
+    </div>
+
+
+    <!-- BACK / NEXT -->
+
+    <div class="navigation">
+
+        <button
+            id="backButton"
+            class="nav-button back-button"
+            onclick="goBack()"
+            disabled
+        >
+            ← Back
+        </button>
+
+        <button
+            class="nav-button next-button"
+            onclick="goNext()"
+        >
+            Next Word →
+        </button>
+
+    </div>
+
+
+    <!-- MESSAGE -->
+
+    <div
+        class="message"
+        id="message"
+    ></div>
+
+</div>
+
+
+<!-- TIME UP -->
+
+<div
+    class="session-over"
+    id="sessionOver"
+>
+
+    <div class="session-card">
+
+        <h2>⏰ Time's Up!</h2>
+
+        <div style="font-size:60px;">
+            🌳
+        </div>
+
+        <p>
+            Great work!
+        </p>
+
+        <p>
+            You spelled
+            <strong id="finalScore">0</strong>
+            words correctly.
+        </p>
+
+        <button
+            class="restart-button"
+            onclick="restartSession()"
+        >
+            🔄 Start Again
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   WORD LIST
+========================================================= */
+
+const cvcWords = [
+"cat","bat","hat","mat","rat","sat","fat","pat",
+"cap","map","tap","nap","bag","rag","tag","wag",
+"van","fan","man","can","ham","jam",
+"bed","red","fed","led","wed","pet","wet","net",
+"jet","get","set","let","hen","pen","ten","men",
+"den","leg","peg","beg",
+"pig","big","dig","fig","wig","sit","hit","fit",
+"bit","kit","lip","dip","tip","rip","zip",
+"fin","pin","win","bin","tin","kid","lid",
+"dog","log","fog","jog","hog","pot","hot","cot",
+"dot","lot","not","top","mop","hop","pop","cop",
+"box","fox","mom","rob",
+"sun","fun","run","bun","gun","cup","pup","bus",
+"bug","mug","rug","hug","cut","hut","nut","gut",
+"tub","rub","sub","mud"
+];
+
+const blendWords = [
+"stop","step","stem","spin","spot","slip","slug",
+"slam","swim","snug","snap","snip","snow",
+"frog","from","flag","flat","flip","flap",
+"clap","clip","club","crab","crop",
+"drum","drop","drip","drag",
+"grab","grin","grip","grow","grass","glad",
+"plan","plug","plum","plot","plus",
+"print","press",
+"truck","trip","trap","trim","trot","twin",
+"swim","star","step","stick","stamp","stand",
+"skip","skin","scan","spin","smell",
+"black","block","blend","blink","blast",
+"brush","bring","brown","cream","crash","fresh",
+"green","grass","sleep","slide","small","smile",
+"snack","spoon","sport",
+"three","throw","train","treat","tree",
+"truck","split","spray"
+];
+
+
+/* =========================================================
+   DEFINITIONS
+========================================================= */
+
+const definitions = {
+
+cat:"A small animal that says meow.",
+bat:"A flying animal that comes out at night.",
+hat:"Something you wear on your head.",
+mat:"Something you put on the floor.",
+rat:"A small animal that looks like a mouse.",
+sat:"Past tense of sit.",
+fat:"Having a lot of body weight.",
+pat:"To gently touch someone or something.",
+cap:"A type of hat.",
+map:"A picture that shows where places are.",
+tap:"To hit something lightly.",
+nap:"A short sleep during the day.",
+bag:"Something used to carry things.",
+rag:"A small piece of old cloth.",
+tag:"A small label attached to something.",
+wag:"To move from side to side.",
+van:"A large vehicle used to carry people or things.",
+fan:"A machine that moves air.",
+man:"An adult male person.",
+can:"A metal container.",
+ham:"Meat that comes from a pig.",
+jam:"A sweet spread made from fruit.",
+bed:"A piece of furniture used for sleeping.",
+red:"A color like an apple.",
+fed:"Gave food to someone or something.",
+led:"Past tense of lead.",
+wed:"Past tense of marry.",
+pet:"An animal that people keep at home.",
+wet:"Covered with water.",
+net:"A material made of connected strings.",
+jet:"A fast airplane.",
+get:"To receive or obtain something.",
+set:"To put something in a particular place.",
+let:"To allow someone to do something.",
+hen:"A female chicken.",
+pen:"A tool used for writing with ink.",
+ten:"The number after nine.",
+men:"More than one man.",
+den:"A home or hiding place for an animal.",
+leg:"A body part used for walking.",
+peg:"A small piece used to hold something.",
+beg:"To ask strongly for something.",
+pig:"A farm animal that says oink.",
+big:"Large in size.",
+dig:"To make a hole in the ground.",
+fig:"A small sweet fruit.",
+wig:"Hair worn on the head.",
+sit:"To rest on a chair or another surface.",
+hit:"To strike something.",
+fit:"The right size or shape.",
+bit:"A small amount.",
+kit:"A group of things used for a purpose.",
+lip:"The edge around your mouth.",
+dip:"To put something briefly into a liquid.",
+tip:"The end or point of something.",
+rip:"To tear something.",
+zip:"A fastener used on clothes or bags.",
+fin:"A body part that helps fish swim.",
+pin:"A small sharp object used to hold things.",
+win:"To be successful in a game.",
+bin:"A container for putting things in.",
+tin:"A small metal container.",
+kid:"A child.",
+lid:"A cover for a container.",
+dog:"A common animal kept as a pet.",
+log:"A piece of wood from a tree.",
+fog:"A thick cloud close to the ground.",
+jog:"To run slowly.",
+hog:"A large pig.",
+pot:"A container used for cooking.",
+hot:"Having a high temperature.",
+cot:"A small bed.",
+dot:"A very small round mark.",
+lot:"A large amount.",
+not:"Used to say something is untrue.",
+top:"The highest part of something.",
+mop:"A tool used to clean floors.",
+hop:"To jump on one foot.",
+pop:"A quick small sound.",
+cop:"A police officer.",
+box:"A container with flat sides.",
+fox:"A wild animal with a bushy tail.",
+mom:"A mother.",
+rob:"To take something from someone illegally.",
+sun:"The bright star that gives Earth light.",
+fun:"Something enjoyable.",
+run:"To move quickly on your feet.",
+bun:"A small round piece of bread.",
+gun:"A weapon.",
+cup:"A small container used for drinking.",
+pup:"A young dog.",
+bus:"A large vehicle that carries passengers.",
+bug:"A small insect.",
+mug:"A large cup used for drinking.",
+rug:"A piece of material placed on the floor.",
+hug:"To hold someone closely with your arms.",
+cut:"To divide something with something sharp.",
+hut:"A small simple building.",
+nut:"A hard-shelled food.",
+gut:"The stomach or intestines.",
+tub:"A large container used for washing.",
+rub:"To move your hand back and forth.",
+sub:"A sandwich or submarine.",
+mud:"Wet soft earth.",
+
+stop:"To not move or continue.",
+step:"To move one foot forward.",
+stem:"The main part of a plant.",
+spin:"To turn around and around.",
+spot:"A small mark or place.",
+slip:"To slide accidentally.",
+slug:"A small soft animal like a snail.",
+slam:"To close something with a loud sound.",
+swim:"To move through water.",
+snug:"Warm and comfortable.",
+snap:"To break or close with a quick sound.",
+snip:"To cut something with scissors.",
+snow:"Soft white ice that falls from the sky.",
+frog:"A small animal that can jump.",
+from:"Used to show where something starts.",
+flag:"A piece of cloth with a special design.",
+flat:"Having a smooth level surface.",
+flip:"To turn something over quickly.",
+flap:"To move up and down.",
+clap:"To hit your hands together.",
+clip:"A small object used to hold things.",
+club:"A group or a heavy stick.",
+crab:"An animal that walks sideways.",
+crop:"Plants grown on a farm.",
+drum:"A musical instrument you hit.",
+drop:"To let something fall.",
+drip:"A small amount of liquid falling.",
+drag:"To pull something along the ground.",
+grab:"To take hold of something quickly.",
+grin:"A wide smile.",
+grip:"To hold something tightly.",
+grow:"To become bigger.",
+grass:"Green plants that cover lawns.",
+glad:"Feeling happy.",
+plan:"An idea about what you will do.",
+plug:"An object used to connect something to electricity.",
+plum:"A small purple fruit.",
+plot:"The main events of a story.",
+plus:"A symbol used for addition.",
+print:"To make letters or pictures on paper.",
+press:"To push something down.",
+truck:"A large vehicle used to carry things.",
+trip:"A journey to another place.",
+trap:"Something used to catch an animal.",
+trim:"To cut something to make it neater.",
+trot:"A horse's slow running movement.",
+twin:"One of two children born at the same time.",
+star:"A bright object in the night sky.",
+stick:"A thin piece of wood.",
+stamp:"A small piece of paper used for mailing.",
+stand:"To be on your feet.",
+skip:"To jump lightly while moving.",
+skin:"The outer covering of your body.",
+scan:"To look over something quickly.",
+smell:"The way something seems through your nose.",
+black:"The darkest color.",
+block:"A solid piece of material.",
+blend:"To mix things together.",
+blink:"To quickly open and close your eyes.",
+blast:"A strong burst of air.",
+brush:"A tool used for cleaning or painting.",
+bring:"To carry something to a place.",
+brown:"A color like chocolate.",
+cream:"A thick white food.",
+crash:"To hit something loudly.",
+fresh:"New or recently made.",
+green:"A color like grass.",
+sleep:"To rest with your eyes closed.",
+slide:"To move smoothly across a surface.",
+small:"Little in size.",
+smile:"A happy expression.",
+snack:"A small amount of food.",
+spoon:"A tool used for eating.",
+sport:"A physical activity or game.",
+three:"The number after two.",
+throw:"To send something through the air.",
+train:"A vehicle that travels on railway tracks.",
+treat:"Something special or enjoyable.",
+tree:"A tall plant with a trunk and branches.",
+split:"To divide something into parts.",
+spray:"To send liquid out in small drops."
+
+};
+
+
+/* =========================================================
+   GAME VARIABLES
+========================================================= */
+
+let currentWord = "";
+let studentWord = "";
+let currentDefinition = "";
+
+let score = 0;
+let questionNumber = 1;
+
+let answered = false;
+
+let history = [];
+let historyIndex = 0;
+
+let timeLeft = 300;
+let timer;
+
+
+/* =========================================================
+   GET RANDOM WORD
+========================================================= */
+
+function getRandomWord() {
+
+    const allWords = [
+        ...cvcWords,
+        ...blendWords
+    ];
+
+    let word;
+
+    do {
+
+        word =
+            allWords[
+                Math.floor(
+                    Math.random() *
+                    allWords.length
+                )
+            ];
+
+    } while (
+        word === currentWord &&
+        allWords.length > 1
+    );
+
+    return word;
+}
+
+
+/* =========================================================
+   START NEW QUESTION
+========================================================= */
+
+function startNewQuestion() {
+
+    currentWord = getRandomWord();
+
+    studentWord = "";
+
+    currentDefinition =
+        definitions[currentWord] ||
+        "A word you are learning.";
+
+    answered = false;
+
+    renderQuestion();
+}
+
+
+/* =========================================================
+   RENDER QUESTION
+========================================================= */
+
+function renderQuestion() {
+
+    document.getElementById(
+        "questionNumber"
+    ).textContent = questionNumber;
+
+    document.getElementById(
+        "definition"
+    ).textContent = currentDefinition;
+
+    document.getElementById(
+        "correctWord"
+    ).textContent = "";
+
+    document.getElementById(
+        "message"
+    ).textContent = "";
+
+    document.getElementById(
+        "message"
+    ).className = "message";
+
+    document.getElementById(
+        "plantHead"
+    ).classList.remove("happy");
+
+    createSlots();
+
+    createLetterButtons();
+
+    updateSlots();
+
+    updateBackButton();
+}
+
+
+/* =========================================================
+   CREATE SLOTS
+========================================================= */
+
+function createSlots() {
+
+    const slots =
+        document.getElementById("slots");
+
+    slots.innerHTML = "";
+
+    for (
+        let i = 0;
+        i < currentWord.length;
+        i++
+    ) {
+
+        const slot =
+            document.createElement("div");
+
+        slot.className =
+            "letter-slot";
+
+        slots.appendChild(slot);
+    }
+}
+
+
+/* =========================================================
+   UPDATE SLOTS
+========================================================= */
+
+function updateSlots() {
+
+    const slots =
+        document.querySelectorAll(
+            ".letter-slot"
+        );
+
+    slots.forEach(
+        function(slot, index) {
+
+            slot.textContent =
+                studentWord[index] || "";
+
+        }
+    );
+}
+
+
+/* =========================================================
+   CREATE LETTER BUTTONS
+========================================================= */
+
+function createLetterButtons() {
+
+    const row1 =
+        document.getElementById(
+            "letterRow1"
+        );
+
+    const row2 =
+        document.getElementById(
+            "letterRow2"
+        );
+
+    row1.innerHTML = "";
+    row2.innerHTML = "";
+
+    let letters =
+        currentWord.split("");
+
+    const alphabet =
+        "abcdefghijklmnopqrstuvwxyz";
+
+    while (
+        letters.length < 10
+    ) {
+
+        letters.push(
+            alphabet[
+                Math.floor(
+                    Math.random() *
+                    alphabet.length
+                )
+            ]
+        );
+
+    }
+
+    letters =
+        letters
+            .slice(0,10)
+            .sort(
+                () => Math.random() - 0.5
+            );
+
+    letters.forEach(
+        function(letter, index) {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "letter-button";
+
+            button.textContent =
+                letter.toUpperCase();
+
+            button.onclick =
+                function() {
+                    selectLetter(letter);
+                };
+
+            if (index < 5) {
+                row1.appendChild(button);
+            } else {
+                row2.appendChild(button);
+            }
+
+        }
+    );
+}
+
+
+/* =========================================================
+   SELECT LETTER
+========================================================= */
+
+function selectLetter(letter) {
+
+    if (answered) {
+        return;
+    }
+
+    if (
+        studentWord.length >=
+        currentWord.length
+    ) {
+        return;
+    }
+
+    studentWord += letter;
+
+    updateSlots();
+
+    if (
+        studentWord.length ===
+        currentWord.length
+    ) {
+
+        checkAnswer();
+
+    }
+}
+
+
+/* =========================================================
+   CHECK ANSWER
+========================================================= */
+
+function checkAnswer() {
+
+    if (
+        studentWord ===
+        currentWord
+    ) {
+
+        correctAnswer();
+
+    } else {
+
+        incorrectAnswer();
+
+    }
+}
+
+
+/* =========================================================
+   CORRECT
+========================================================= */
+
+function correctAnswer() {
+
+    if (answered) {
+        return;
+    }
+
+    answered = true;
+
+    score++;
+
+    document.getElementById(
+        "score"
+    ).textContent = score;
+
+    document.getElementById(
+        "correctWord"
+    ).textContent =
+        "The word is: " +
+        currentWord.toUpperCase();
+
+    const messages = [
+        "Good Job! ⭐",
+        "Well Done! 🎉",
+        "Excellent! 🌟",
+        "Impressive! 🏆",
+        "Great Work! 👏",
+        "Awesome! ⭐",
+        "Amazing! 🎉",
+        "Fantastic! 🌟",
+        "You Got It! 🥳",
+        "Super Spelling! 🌱"
+    ];
+
+    document.getElementById(
+        "message"
+    ).textContent =
+        messages[
+            Math.floor(
+                Math.random() *
+                messages.length
+            )
+        ];
+
+    document.getElementById(
+        "message"
+    ).className =
+        "message correct-message";
+
+    document.getElementById(
+        "plantHead"
+    ).classList.add("happy");
+
+    updatePlant();
+
+    createStars();
+
+    document
+        .querySelectorAll(".letter-button")
+        .forEach(
+            function(button) {
+                button.disabled = true;
+            }
+        );
+
+    speakCorrectWord();
+}
+
+
+/* =========================================================
+   GROW PLANT
+========================================================= */
+
+function updatePlant() {
+
+    const plant =
+        document.getElementById(
+            "plant"
+        );
+
+    let stage = 0;
+
+    if (score >= 20) {
+        stage = 6;
+    } else if (score >= 16) {
+        stage = 5;
+    } else if (score >= 12) {
+        stage = 4;
+    } else if (score >= 8) {
+        stage = 3;
+    } else if (score >= 4) {
+        stage = 2;
+    } else if (score >= 1) {
+        stage = 1;
+    }
+
+    plant.className =
+        "plant growth-" + stage;
+
+    void plant.offsetWidth;
+
+    plant.classList.add(
+        "grow-animation"
+    );
+
+    setTimeout(
+        function() {
+            plant.classList.remove(
+                "grow-animation"
+            );
+        },
+        700
+    );
+
+    if (score >= 20) {
+
+        document.getElementById(
+            "growthText"
+        ).textContent =
+            "🌳 Fully grown! 20 / 20";
+
+    } else {
+
+        document.getElementById(
+            "growthText"
+        ).textContent =
+            "🌱 " +
+            score +
+            " / 20 correct";
+
+    }
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        Math.min(
+            score * 5,
+            100
+        ) + "%";
+}
+
+
+/* =========================================================
+   INCORRECT
+========================================================= */
+
+function incorrectAnswer() {
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+    message.textContent =
+        "Not quite! Try again!";
+
+    message.className =
+        "message incorrect-message";
+
+    setTimeout(
+        function() {
+
+            if (!answered) {
+
+                studentWord =
+                    studentWord.slice(
+                        0,
+                        -1
+                    );
+
+                updateSlots();
+
+            }
+
+        },
+        600
+    );
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+function deleteLetter() {
+
+    if (answered) {
+        return;
+    }
+
+    studentWord =
+        studentWord.slice(
+            0,
+            -1
+        );
+
+    updateSlots();
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+function clearWord() {
+
+    if (answered) {
+        return;
+    }
+
+    studentWord = "";
+
+    updateSlots();
+}
+
+
+/* =========================================================
+   NEXT WORD
+========================================================= */
+
+function goNext() {
+
+    /*
+       Start a completely new word.
+    */
+
+    startNewQuestion();
+
+    /*
+       Save this question in history.
+    */
+
+    history =
+        history.slice(
+            0,
+            historyIndex + 1
+        );
+
+    history.push({
+        word: currentWord,
+        definition: currentDefinition,
+        studentWord: studentWord,
+        answered: answered
+    });
+
+    historyIndex =
+        history.length - 1;
+
+    questionNumber =
+        historyIndex + 1;
+
+    document.getElementById(
+        "questionNumber"
+    ).textContent =
+        questionNumber;
+
+    updateBackButton();
+}
+
+
+/* =========================================================
+   BACK
+========================================================= */
+
+function goBack() {
+
+    if (historyIndex <= 0) {
+        return;
+    }
+
+    /*
+       Save current question first.
+    */
+
+    history[historyIndex] = {
+        word: currentWord,
+        definition: currentDefinition,
+        studentWord: studentWord,
+        answered: answered
+    };
+
+    historyIndex--;
+
+    const previous =
+        history[historyIndex];
+
+    currentWord =
+        previous.word;
+
+    currentDefinition =
+        previous.definition;
+
+    studentWord =
+        previous.studentWord;
+
+    answered =
+        previous.answered;
+
+    questionNumber =
+        historyIndex + 1;
+
+    renderQuestion();
+
+    /*
+       Restore completed question.
+    */
+
+    if (answered) {
+
+        document.getElementById(
+            "correctWord"
+        ).textContent =
+            "The word is: " +
+            currentWord.toUpperCase();
+
+        document.getElementById(
+            "message"
+        ).textContent =
+            "You already got it! ⭐";
+
+        document.getElementById(
+            "message"
+        ).className =
+            "message correct-message";
+
+        document.getElementById(
+            "plantHead"
+        ).classList.add("happy");
+
+        document
+            .querySelectorAll(".letter-button")
+            .forEach(
+                function(button) {
+                    button.disabled = true;
+                }
+            );
+    }
+
+    updateBackButton();
+}
+
+
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+function updateBackButton() {
+
+    const button =
+        document.getElementById(
+            "backButton"
+        );
+
+    button.disabled =
+        historyIndex <= 0;
+}
+
+
+/* =========================================================
+   SPEECH
+========================================================= */
+
+function speakWord() {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+        return;
+    }
+
+    speechSynthesis.cancel();
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            currentWord
+        );
+
+    speech.lang = "en-US";
+    speech.volume = 1;
+    speech.rate = 0.65;
+    speech.pitch = 1;
+
+    const voices =
+        speechSynthesis.getVoices();
+
+    const voice =
+        voices.find(
+            function(v) {
+                return v.lang === "en-US";
+            }
+        ) ||
+        voices.find(
+            function(v) {
+                return v.lang.startsWith("en");
+            }
+        );
+
+    if (voice) {
+        speech.voice = voice;
+    }
+
+    speechSynthesis.speak(
+        speech
+    );
+}
+
+
+/* =========================================================
+   CORRECT WORD SPEECH
+========================================================= */
+
+function speakCorrectWord() {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+        return;
+    }
+
+    speechSynthesis.cancel();
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            currentWord
+        );
+
+    speech.lang = "en-US";
+    speech.volume = 1;
+    speech.rate = 0.6;
+
+    speechSynthesis.speak(
+        speech
+    );
+}
+
+
+/* =========================================================
+   PLANT BLINK
+========================================================= */
+
+function blinkPlant() {
+
+    const head =
+        document.getElementById(
+            "plantHead"
+        );
+
+    head.classList.add(
+        "blink"
+    );
+
+    setTimeout(
+        function() {
+            head.classList.remove(
+                "blink"
+            );
+        },
+        140
+    );
+}
+
+function randomBlink() {
+
+    setTimeout(
+        function() {
+
+            blinkPlant();
+
+            randomBlink();
+
+        },
+        2500 +
+        Math.random() * 3000
+    );
+}
+
+randomBlink();
+
+
+/* =========================================================
+   STARS
+========================================================= */
+
+function createStars() {
+
+    for (
+        let i = 0;
+        i < 12;
+        i++
+    ) {
+
+        const star =
+            document.createElement(
+                "div"
+            );
+
+        star.className =
+            "star";
+
+        star.textContent =
+            "⭐";
+
+        star.style.left =
+            (
+                20 +
+                Math.random() * 60
+            ) + "%";
+
+        star.style.top =
+            (
+                35 +
+                Math.random() * 30
+            ) + "%";
+
+        document.body.appendChild(
+            star
+        );
+
+        setTimeout(
+            function() {
+                star.remove();
+            },
+            1000
+        );
+    }
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function startTimer() {
+
+    clearInterval(timer);
+
+    timer =
+        setInterval(
+            function() {
+
+                timeLeft--;
+
+                updateTimer();
+
+                if (
+                    timeLeft <= 0
+                ) {
+
+                    clearInterval(
+                        timer
+                    );
+
+                    endSession();
+                }
+
+            },
+            1000
+        );
+}
+
+
+/* =========================================================
+   TIMER DISPLAY
+========================================================= */
+
+function updateTimer() {
+
+    const minutes =
+        Math.floor(
+            timeLeft / 60
+        );
+
+    const seconds =
+        timeLeft % 60;
+
+    const timerDisplay =
+        document.getElementById(
+            "timer"
+        );
+
+    timerDisplay.textContent =
+        minutes +
+        ":" +
+        String(seconds).padStart(
+            2,
+            "0"
+        );
+
+    timerDisplay.classList.remove(
+        "warning",
+        "danger"
+    );
+
+    if (timeLeft <= 30) {
+
+        timerDisplay.classList.add(
+            "danger"
+        );
+
+    } else if (
+        timeLeft <= 120
+    ) {
+
+        timerDisplay.classList.add(
+            "warning"
+        );
+    }
+}
+
+
+/* =========================================================
+   END SESSION
+========================================================= */
+
+function endSession() {
+
+    document.getElementById(
+        "finalScore"
+    ).textContent =
+        score;
+
+    document.getElementById(
+        "sessionOver"
+    ).style.display =
+        "flex";
+}
+
+
+/* =========================================================
+   RESTART
+========================================================= */
+
+function restartSession() {
+
+    document.getElementById(
+        "sessionOver"
+    ).style.display =
+        "none";
+
+    score = 0;
+
+    questionNumber = 1;
+
+    currentWord = "";
+
+    studentWord = "";
+
+    currentDefinition = "";
+
+    answered = false;
+
+    history = [];
+
+    historyIndex = 0;
+
+    timeLeft = 300;
+
+    document.getElementById(
+        "score"
+    ).textContent =
+        "0";
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        "0%";
+
+    document.getElementById(
+        "growthText"
+    ).textContent =
+        "🌱 0 / 20 correct";
+
+    document.getElementById(
+        "plant"
+    ).className =
+        "plant growth-0";
+
+    startNewQuestion();
+
+    history.push({
+        word: currentWord,
+        definition: currentDefinition,
+        studentWord: "",
+        answered: false
+    });
+
+    historyIndex = 0;
+
+    updateTimer();
+
+    updateBackButton();
+
+    startTimer();
+}
+
+
+/* =========================================================
+   INITIAL GAME
+========================================================= */
+
+startNewQuestion();
+
+history.push({
+    word: currentWord,
+    definition: currentDefinition,
+    studentWord: "",
+    answered: false
+});
+
+historyIndex = 0;
+
+updateBackButton();
+
+updateTimer();
+
+startTimer();
+
+</script>
+
+</body>
+</html>
