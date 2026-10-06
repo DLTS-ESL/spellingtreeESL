@@ -64,6 +64,65 @@ body {
     font-weight: bold;
 }
 
+.timer-controls {
+    margin: 10px 0 14px;
+    text-align: center;
+}
+
+.timer-options {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.timer-options button {
+    border: none;
+    background: #e0e0e0;
+    padding: 7px 11px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.timer-options button:hover:not(:disabled) {
+    transform: scale(1.03);
+}
+
+.timer-options button.selected {
+    background: #81c784;
+    color: white;
+}
+
+.timer-options button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.start-timer-button {
+    border: none;
+    background: #42a5f5;
+    color: white;
+    padding: 9px 20px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.start-timer-button:hover:not(:disabled) {
+    transform: scale(1.03);
+}
+
+.start-timer-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .timer {
     color: #2e7d32;
 }
@@ -815,6 +874,27 @@ body {
 
     </div>
 
+    <!-- TIMER CONTROLS -->
+
+    <div class="timer-controls">
+
+        <div class="timer-options">
+            <button onclick="selectTime(1)">1 min</button>
+            <button onclick="selectTime(2)">2 mins</button>
+            <button onclick="selectTime(3)">3 mins</button>
+            <button onclick="selectTime(4)">4 mins</button>
+            <button onclick="selectTime(5)" class="selected">5 mins</button>
+        </div>
+
+        <button
+            class="start-timer-button"
+            onclick="startSelectedTimer()"
+        >
+            ▶ Start Timer
+        </button>
+
+    </div>
+
 
     <!-- PROGRESS -->
 
@@ -1277,8 +1357,10 @@ let answered = false;
 let history = [];
 let historyIndex = 0;
 
+let selectedMinutes = 5;
 let timeLeft = 300;
-let timer;
+let timer = null;
+let timerStarted = false;
 
 
 /* =========================================================
@@ -2088,6 +2170,65 @@ function createStars() {
    TIMER
 ========================================================= */
 
+function selectTime(minutes) {
+
+    if (timerStarted) {
+        return;
+    }
+
+    selectedMinutes = minutes;
+    timeLeft = minutes * 60;
+
+    updateTimer();
+
+    document
+        .querySelectorAll(".timer-options button")
+        .forEach(function(button) {
+
+            button.classList.remove("selected");
+
+        });
+
+    document
+        .querySelectorAll(".timer-options button")
+        .forEach(function(button) {
+
+            if (
+                button.textContent
+                    .trim()
+                    .startsWith(minutes.toString())
+            ) {
+                button.classList.add("selected");
+            }
+
+        });
+}
+
+
+function startSelectedTimer() {
+
+    if (timerStarted) {
+        return;
+    }
+
+    timerStarted = true;
+
+    document
+        .querySelectorAll(".timer-options button")
+        .forEach(function(button) {
+            button.disabled = true;
+        });
+
+    const startButton =
+        document.querySelector(".start-timer-button");
+
+    startButton.textContent = "⏱️ Timer Running";
+    startButton.disabled = true;
+
+    startTimer();
+}
+
+
 function startTimer() {
 
     clearInterval(timer);
@@ -2107,6 +2248,9 @@ function startTimer() {
                     clearInterval(
                         timer
                     );
+
+                    timer = null;
+                    timerStarted = false;
 
                     endSession();
                 }
@@ -2211,7 +2355,10 @@ function restartSession() {
 
     historyIndex = 0;
 
-    timeLeft = 300;
+    clearInterval(timer);
+    timer = null;
+    timerStarted = false;
+    timeLeft = selectedMinutes * 60;
 
     document.getElementById(
         "score"
@@ -2248,7 +2395,17 @@ function restartSession() {
 
     updateBackButton();
 
-    startTimer();
+    document
+        .querySelectorAll(".timer-options button")
+        .forEach(function(button) {
+            button.disabled = false;
+        });
+
+    const startButton =
+        document.querySelector(".start-timer-button");
+
+    startButton.textContent = "▶ Start Timer";
+    startButton.disabled = false;
 }
 
 
@@ -2270,8 +2427,6 @@ historyIndex = 0;
 updateBackButton();
 
 updateTimer();
-
-startTimer();
 
 </script>
 
